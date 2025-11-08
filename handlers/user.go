@@ -9,3 +9,11 @@ func Signup() gin.HandlerFunc {
 		})
 	}
 }
+
+func Login() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "login success",
+		})
+	}
+}
