@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// CreateUser handler for creating user
 func CreateUser(db *pgxpool.Pool, username, email, password string) error {
 	_, err := db.Exec(context.Background(), `
 			INSERT INTO users (username, email, password)
