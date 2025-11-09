@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+// InitDB Connect to database
 func InitDB() (*pgxpool.Pool, error) {
 	dsn := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s",
