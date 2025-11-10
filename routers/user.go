@@ -9,5 +9,5 @@ import (
 
 func SetupRouter(r *gin.Engine, db *pgxpool.Pool) {
 	r.POST("signup/", handlers.Signup(db))
-	r.POST("login/", handlers.Login())
+	r.POST("login/", handlers.Login(db))
 }

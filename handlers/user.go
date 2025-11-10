@@ -30,13 +30,7 @@ func Signup(db *pgxpool.Pool) gin.HandlerFunc {
 			return
 		}
 
-		salt, err := cryptography.GenerateSalt(32)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		hash := cryptography.HashPassword(request.Password, salt)
+		hash, err := cryptography.HashPassword(request.Password)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -59,10 +53,31 @@ func Signup(db *pgxpool.Pool) gin.HandlerFunc {
 	}
 }
 
-func Login() gin.HandlerFunc {
+func Login(db *pgxpool.Pool) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var request struct {
+			Username string `json:"username" binding:"required"`
+			Password string `json:"password" binding:"required"`
+		}
+
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON"})
+			return
+		}
+
+		user, err := queries.GetUser(db, request.Username)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		check := cryptography.VerifyPassword(request.Password, user.Password)
+		if !check {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid login or password"})
+			return
+		}
 		c.JSON(200, gin.H{
-			"message": "login success",
+			"user": *user,
 		})
 	}
 }
