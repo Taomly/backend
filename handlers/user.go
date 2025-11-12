@@ -6,6 +6,7 @@ import (
 	"auth/internal/validation"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -78,12 +79,18 @@ func Login(db *pgxpool.Pool) gin.HandlerFunc {
 		}
 
 		accessToken, err := cryptography.GenerateAccessToken(user.ID)
-		refreshToken, err := cryptography.GenerateRefreshToken(user.ID)
-
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+
+		refreshToken, err := cryptography.GenerateRefreshToken(user.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		err = queries.StoreRefreshToken(db, refreshToken, time.Now().Add(time.Hour*24*30).Unix())
 
 		c.JSON(200, gin.H{
 			"accessToken":  accessToken,

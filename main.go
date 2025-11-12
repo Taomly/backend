@@ -2,7 +2,6 @@ package main
 
 import (
 	"auth/internal/database"
-	"auth/internal/database/queries"
 	"auth/routers"
 	"log"
 	"os"
@@ -23,7 +22,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = queries.CreateTable(db)
+	err = database.CreateTables(db)
 	if err != nil {
 		log.Fatal(err)
 	}
