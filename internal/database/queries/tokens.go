@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// StoreRefreshToken store token to check and refresh
 func StoreRefreshToken(db *pgxpool.Pool, token string, time int64) error {
 	_, err := db.Exec(context.Background(), `
 		INSERT INTO refresh_tokens (token, token_expires_at)
