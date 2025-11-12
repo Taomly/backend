@@ -76,8 +76,18 @@ func Login(db *pgxpool.Pool) gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid login or password"})
 			return
 		}
+
+		accessToken, err := cryptography.GenerateAccessToken(user.ID)
+		refreshToken, err := cryptography.GenerateRefreshToken(user.ID)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
 		c.JSON(200, gin.H{
-			"user": *user,
+			"accessToken":  accessToken,
+			"refreshToken": refreshToken,
 		})
 	}
 }
