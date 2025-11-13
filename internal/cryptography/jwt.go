@@ -11,6 +11,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type Token struct {
+	ID        int       `json:"id"`
+	ExpiresAt time.Time `json:"expires_at"`
+}
+
 func GetJWTSecretKey() (string, error) {
 	if os.Getenv("CI") == "" {
 		err := godotenv.Load()
@@ -39,9 +44,11 @@ func ExtractToken(authorizationHeader string) (string, error) {
 }
 
 func GenerateAccessToken(id int) (string, error) {
+	expiresAt := time.Now().Add(time.Hour).Unix()
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":  id,
-		"exp": time.Now().Add(time.Hour * 1).Unix(),
+		"id":         id,
+		"expires_at": expiresAt,
 	})
 
 	password, err := GetJWTSecretKey()
@@ -53,9 +60,11 @@ func GenerateAccessToken(id int) (string, error) {
 }
 
 func GenerateRefreshToken(id int) (string, error) {
+	expiresAt := time.Now().Add(time.Hour * 24 * 30).Unix()
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":  id,
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+		"id":         id,
+		"expires_at": expiresAt,
 	})
 
 	password, err := GetJWTSecretKey()
