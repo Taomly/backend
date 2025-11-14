@@ -90,7 +90,7 @@ func Login(db *pgxpool.Pool) gin.HandlerFunc {
 			return
 		}
 
-		err = queries.StoreRefreshToken(db, refreshToken, time.Now().Add(time.Hour*24*30).Unix())
+		err = queries.StoreRefreshToken(db, user.ID, refreshToken, time.Now().Add(cryptography.RefreshTokenTTL).Unix())
 
 		c.JSON(200, gin.H{
 			"accessToken":  accessToken,
@@ -99,6 +99,7 @@ func Login(db *pgxpool.Pool) gin.HandlerFunc {
 	}
 }
 
+// ResetPassword Надо реализовать удаление всех токенов после смены пароля
 func ResetPassword(db *pgxpool.Pool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request struct {
@@ -128,7 +129,7 @@ func ResetPassword(db *pgxpool.Pool) gin.HandlerFunc {
 			return
 		}
 
-		token, err := validation.ValidateAccessToken(tokenString)
+		token, err := validation.ValidateToken(tokenString)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return

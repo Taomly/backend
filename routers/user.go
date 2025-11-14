@@ -11,4 +11,5 @@ func SetupRouter(r *gin.Engine, db *pgxpool.Pool) {
 	r.POST("signup/", handlers.Signup(db))
 	r.POST("login/", handlers.Login(db))
 	r.POST("reset/", handlers.ResetPassword(db))
+	r.POST("refresh/", handlers.RefreshToken(db))
 }

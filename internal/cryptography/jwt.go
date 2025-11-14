@@ -11,6 +11,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
+var (
+	AccessTokenTTL  = time.Hour           // 1 час
+	RefreshTokenTTL = time.Hour * 24 * 30 // 30 дней
+)
+
 type Token struct {
 	ID        int       `json:"id"`
 	ExpiresAt time.Time `json:"expires_at"`
@@ -44,7 +49,7 @@ func ExtractToken(authorizationHeader string) (string, error) {
 }
 
 func GenerateAccessToken(id int) (string, error) {
-	expiresAt := time.Now().Add(time.Hour).Unix()
+	expiresAt := time.Now().Add(AccessTokenTTL).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":         id,
@@ -60,7 +65,7 @@ func GenerateAccessToken(id int) (string, error) {
 }
 
 func GenerateRefreshToken(id int) (string, error) {
-	expiresAt := time.Now().Add(time.Hour * 24 * 30).Unix()
+	expiresAt := time.Now().Add(RefreshTokenTTL).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":         id,

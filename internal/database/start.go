@@ -24,6 +24,7 @@ func CreateTables(db *pgxpool.Pool) error {
 	_, err = db.Exec(ctx, `
 		CREATE TABLE IF NOT EXISTS refresh_tokens (
 			id serial PRIMARY KEY,
+			user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			token TEXT NOT NULL,
 			token_expires_at BIGINT NOT NULL
 		)

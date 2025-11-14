@@ -8,7 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func ValidateAccessToken(accessToken string) (*cryptography.Token, error) {
+func ValidateToken(accessToken string) (*cryptography.Token, error) {
 	secretKey, err := cryptography.GetJWTSecretKey()
 	if err != nil {
 		return nil, err
