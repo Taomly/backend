@@ -79,3 +79,12 @@ func UpdateUserPassword(db *pgxpool.Pool, id int, password string) error {
 
 	return nil
 }
+
+func DeleteUser(db *pgxpool.Pool, id int) error {
+	_, err := db.Exec(context.Background(),
+		"DELETE FROM users WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

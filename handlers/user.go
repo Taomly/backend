@@ -170,3 +170,51 @@ func ResetPassword(db *pgxpool.Pool) gin.HandlerFunc {
 		})
 	}
 }
+
+func DeleteUser(db *pgxpool.Pool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request struct {
+			Password string `json:"password" binding:"required"`
+		}
+
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON"})
+			return
+		}
+
+		tokenString, err := cryptography.ExtractToken(c.GetHeader("Authorization"))
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
+
+		token, err := validation.ValidateToken(tokenString)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		user, err := queries.GetUserByID(db, token.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		check := cryptography.VerifyPassword(request.Password, user.Password)
+		if !check {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid login or password"})
+			return
+		}
+
+		err = queries.DeleteUser(db, user.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(200, gin.H{
+			"message": "user deleted",
+		})
+
+	}
+}
