@@ -28,3 +28,11 @@ func RestoreRefreshToken(db *pgxpool.Pool, oldToken, newToken string) error {
 	}
 	return nil
 }
+
+func DeleteAllUserTokens(db *pgxpool.Pool, userId int) error {
+	_, err := db.Exec(context.Background(), "DELETE FROM refresh_tokens WHERE user_id = $1", userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}

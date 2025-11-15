@@ -159,6 +159,12 @@ func ResetPassword(db *pgxpool.Pool) gin.HandlerFunc {
 			return
 		}
 
+		err = queries.DeleteAllUserTokens(db, user.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
 		c.JSON(200, gin.H{
 			"message": "password updated",
 		})
