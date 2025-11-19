@@ -14,7 +14,8 @@ func CreateTables(db *pgxpool.Pool) error {
 			id serial PRIMARY KEY,
 			username VARCHAR(20) NOT NULL UNIQUE,
 			email VARCHAR(70) NOT NULL UNIQUE,
-			password TEXT NOT NULL
+			password TEXT NOT NULL,
+		    admin BOOLEAN DEFAULT FALSE,
 		)
 	`)
 	if err != nil {
