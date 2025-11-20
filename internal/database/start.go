@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// CreateTables create sql tables
 func CreateTables(db *pgxpool.Pool) error {
 	ctx := context.Background()
 
